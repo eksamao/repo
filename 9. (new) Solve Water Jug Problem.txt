@@ -1,0 +1,36 @@
+from collections import deque
+
+def water_jug_problem():
+    queue = deque([(0, 0, [])])  
+    visited = set()
+
+    while queue:
+        jug5, jug3, path = queue.popleft()
+        path = path + [(jug5, jug3)]  
+
+        if jug5 == 4 or jug3 == 4 or jug5 + jug3 == 4:
+            return path  # Return the path to the solution
+
+        if (jug5, jug3) in visited:
+            continue
+        visited.add((jug5, jug3))
+
+        next_states = [
+            (5, jug3), (jug5, 3), (0, jug3), (jug5, 0),  
+            (max(0, jug5 - (3 - jug3)), min(3, jug5 + jug3)),  
+            (min(5, jug5 + jug3), max(0, jug3 - (5 - jug5)))  
+        ]
+        
+        for state in next_states:
+            if state not in visited:
+                queue.append((*state, path))  
+
+    return None 
+
+solution = water_jug_problem()
+if solution:
+    print("Steps to obtain 4 liters:")
+    for step in solution:
+        print(f"Jug5: {step[0]} liters, Jug3: {step[1]} liters")
+else:
+    print("It is not possible to measure 4 liters.")
