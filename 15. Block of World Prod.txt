@@ -1,0 +1,53 @@
+from collections import deque
+class State:
+    def __init__(self, stacks):
+        self.stacks = stacks
+
+    def __str__(self):
+        return str(self.stacks)
+
+    def is_goal(self, goal):
+        return self.stacks == goal.stacks
+
+    def get_possible_moves(self):
+        moves = []
+        for i, stack in enumerate(self.stacks):
+            if stack:  
+                top_block = stack[-1]
+                for j, other_stack in enumerate(self.stacks):
+                    if i != j:
+                        new_stacks = [s[:] for s in self.stacks]  
+                        new_stacks[i] = new_stacks[i][:-1]  
+                        new_stacks[j].append(top_block)
+                        moves.append((State(new_stacks), f'Move {top_block} from stack {i} to stack {j}'))  
+        return moves
+
+def bfs(initial_state, goal_state):
+    queue = deque([(initial_state, [])])  
+    visited = set()
+
+    while queue:
+        current_state, actions = queue.popleft()
+        if current_state.is_goal(goal_state):
+            return current_state, actions  
+        visited.add(str(current_state))
+        for move, action in current_state.get_possible_moves():
+            if str(move) not in visited:
+                queue.append((move, actions + [action]))
+
+    return None  
+initial_stacks = [['B', 'A'], ['C'], ['D']]
+goal_stacks = [['C', 'A'], [], ['B', 'D']]
+
+initial_state = State(initial_stacks)
+goal_state = State(goal_stacks)
+
+solution, actions = bfs(initial_state, goal_state)
+
+if solution:
+    print("Solution found:", solution)
+    print("Actions taken:")
+    for action in actions:
+        print(action)
+else:
+    print("No solution found.")
